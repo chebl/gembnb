@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Ad;
+use App\Entity\Image;
 use App\Form\AnnonceType;
 use App\Repository\AdRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,10 +34,16 @@ class AdController extends AbstractController
      */
     public function create(Request $request){
         $ad=new Ad();
+     
         $form=$this->createForm(AnnonceType::class,$ad);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $entityManager = $this->getDoctrine()->getManager();
+            
+            foreach($ad->getImages() as $image){
+                $image->setAd($ad);
+                $entityManager->persist($image);
+            }
             $entityManager->persist($ad);
             $entityManager->flush();
             $this->addFlash('success',
@@ -49,7 +56,42 @@ class AdController extends AbstractController
         return $this->render('ad/new.html.twig',[
             'form'=>$form->createView()
         ]); 
-     } 
+     }
+     
+     /**
+     * Permet de modifier une annonce
+     *
+     * @Route("/ads/{slug}/edit",name="ads_edit")
+     * 
+     * @return Response
+     */
+    public function edit(Ad $ad,Request $request){
+        
+     
+        $form=$this->createForm(AnnonceType::class,$ad);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $entityManager = $this->getDoctrine()->getManager();
+            
+            foreach($ad->getImages() as $image){
+                $image->setAd($ad);
+                $entityManager->persist($image);
+            }
+            $entityManager->persist($ad);
+            $entityManager->flush();
+            $this->addFlash('success',
+            "Les modifications de l'annonce <strong>".$ad->getTitle()."</strong> ont bien été enregistrée !"
+            ); 
+            return $this->redirectToRoute('ads_show',[
+                'slug'=>$ad->getSlug()
+            ]);
+        }  
+        return $this->render('ad/edit.html.twig',[
+            'form'=>$form->createView(),
+            'ad' =>$ad
+        ]); 
+     }
+
     /**
      * Permet d'afficher une seule annonce
      *
