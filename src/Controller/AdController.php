@@ -43,7 +43,9 @@ class AdController extends AbstractController
             foreach($ad->getImages() as $image){
                 $image->setAd($ad);
                 $entityManager->persist($image);
-            }
+            } 
+            $ad->setAuthor($this->getUser());
+            
             $entityManager->persist($ad);
             $entityManager->flush();
             $this->addFlash('success',
