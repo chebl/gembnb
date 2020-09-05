@@ -151,6 +151,19 @@ class AccountController extends Controller {
         ]);
 
     }
+      /**
+     * permet d'afficher la liste des réservations de l'utilisateur connecté  
+     * 
+     * @Route("/account/bookings", name="account_bookings")
+     *  
+     */
+    public function bookings(){
+
+        return $this->render('account/bookings.html.twig',[
+             
+        ]);
+
+    }
     
     
 }
